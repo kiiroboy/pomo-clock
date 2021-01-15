@@ -1,0 +1,4 @@
+before running the timer, the text would show the current time, when pressing the start, the current time feature will be stopped and replaced with timer
+
+implement a class Sessions which includes 
+implement a "end sessions" which ends the current timer and return the timer to clock
