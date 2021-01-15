@@ -3,37 +3,24 @@ import time
 class Application(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
-        self.pack(anchor=tk.CENTER,expand=1,fill=tk.BOTH)
         self.master = master
-        self.master.resizable(False, False)
-
-        # state for clock and timer
-        self.timer_state = False
-        self.clock_state = True
-        
+        self.pack()
         self.display()
         
     def display(self):
-        
-        # FIRST FRAME
-        self.first_frame = tk.Frame(self)
+        # state for clock and timer
+        self.timer_state = False
+        self.clock_state = True
 
         # text displaying the time 
-        self.prime_text = tk.Label(self.first_frame, text="Testing", font=("",50))
+        self.prime_text = tk.Label(self, text="Testing", font=("",50))
         self.prime_text.config(bg="gray")
-        self.prime_text.pack(side=tk.TOP, fill=tk.BOTH)
+        self.prime_text.pack(side=tk.TOP, anchor=tk.W, fill=X, expand=True)
 
         #timer buttons
-        self.timer_start = tk.Button(self.first_frame, text="Start", command=self.start, font=("",50))
-        self.timer_start.pack(side=tk.LEFT)
-        self.timer_pause = tk.Button(self.first_frame, text="Pause", command=self.pause, font=("",50))
-        self.timer_pause.pack(side=tk.LEFT)
-
-        self.first_frame.pack(anchor=tk.CENTER, side=tk.TOP, fill=tk.BOTH, expand=1)
-        
-        # SECOND FRAME
-        self.second_frame = tk.Frame(self)
-        
+        self.timer_start = tk.Button(self, text="Start", command=self.start, font=("",50))
+        self.timer_start.pack(anchor= tk.W, fill=tk.BOTH)
+        self.timer_pause = tk.Button(self, text="Pause", command=self.pause, font=("",50))
         # setting button
         self.setting = tk.Button(self, text="Settings", command=self.open_setting_window, font=("",50))
         
