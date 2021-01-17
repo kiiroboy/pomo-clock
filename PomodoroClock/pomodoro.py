@@ -19,29 +19,34 @@ class Application(tk.Frame):
         self.first_frame = tk.Frame(self)
 
         # text displaying the time 
-        self.prime_text = tk.Label(self.first_frame, text="Testing", font=("",50))
+        self.prime_text = tk.Label(self.first_frame, text="Testing", font=("",60))
         self.prime_text.config(bg="gray")
         self.prime_text.pack(side=tk.TOP, fill=tk.BOTH)
 
-        #timer buttons
+        # timer buttons
         self.timer_start = tk.Button(self.first_frame, text="Start", command=self.start, font=("",50))
         self.timer_start.pack(side=tk.LEFT)
         self.timer_pause = tk.Button(self.first_frame, text="Pause", command=self.pause, font=("",50))
         self.timer_pause.pack(side=tk.LEFT)
 
+        # display the first_frame
         self.first_frame.pack(anchor=tk.CENTER, side=tk.TOP, fill=tk.BOTH, expand=1)
         
         # SECOND FRAME
         self.second_frame = tk.Frame(self)
         
         # setting button
-        self.setting = tk.Button(self, text="Settings", command=self.open_setting_window, font=("",50))
+        self.setting = tk.Button(self.second_frame, text="Settings", command=self.open_setting_window, font=("",20))
+        self.setting.pack(side=tk.TOP, fill=tk.BOTH)
         
         # quit button
-        self.quit = tk.Button(self, text="QUIT", fg="red", command=self.master.destroy, font=("",50))
+        self.quit = tk.Button(self.second_frame, text="Quit", fg="red", command=self.master.destroy, font=("",20))
+        self.quit.pack(side=tk.BOTTOM, fill=tk.BOTH)
 
-        
-        #run the clock
+        # display the second_frame
+        self.second_frame.pack(anchor=tk.CENTER, side=tk.BOTTOM, fill=tk.BOTH, expand=1)
+
+        # run the clock
         self.clock_f()
 
     def open_setting_window(self):
