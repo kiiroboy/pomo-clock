@@ -4,3 +4,5 @@ implement a class Sessions which includes
 implement a "end sessions" which ends the current timer and return the timer to clock
 
 testing
+
+change start and pause to shape
