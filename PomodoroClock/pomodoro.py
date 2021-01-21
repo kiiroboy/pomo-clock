@@ -1,12 +1,13 @@
 import tkinter as tk
-import time
+import notify2 as notification
+import pygame
 from configparser import ConfigParser
 
 
 class Application(tk.Frame):
     def __init__(self, master=None):
         super(Application, self).__init__(master)
-        self.pack(anchor=tk.CENTER,expand=1,fill=tk.BOTH)
+        self.pack(anchor=tk.CENTER, expand=1, fill=tk.BOTH)
 
         # init variables
         self.modes = {}
@@ -14,7 +15,9 @@ class Application(tk.Frame):
         self.curr_timer = None
         self.remaining = self.modes["pomodoro"]*60
         self.timer_paused = False
-        
+        pygame.init()
+        pygame.mixer.init()
+
         self.create_widgets() 
 
     def create_widgets(self):
@@ -27,8 +30,8 @@ class Application(tk.Frame):
         self.top_frame.pack(anchor=tk.CENTER, side=tk.TOP, fill=tk.BOTH, expand=1)
 
         # Display current time
-        self.clock_text = tk.Label(self.top_frame, text="00:00:00", font=("",10), bg="black", fg="white")
-        self.clock_text.pack(side=tk.TOP, fill = tk.BOTH, expand=1)
+        self.clock_text = tk.Label(self.top_frame, text="00:00:00", font=("", 10), bg="black", fg="white")
+        self.clock_text.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
         self.clock_f()
         
         # Timer Mode
@@ -55,16 +58,16 @@ class Application(tk.Frame):
         minute, second = divmod(self.remaining, 60)
         hour, minute = divmod(minute, 60) 
         time_format = "{:02d}:{:02d}:{:02d}".format(hour, minute, second)
-        self.timer_text = tk.Label(self.middle_frame, text=time_format, font=("",55))
+        self.timer_text = tk.Label(self.middle_frame, text=time_format, font=("", 55))
         self.timer_text.config(bg="gray")
         self.timer_text.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
         # Start button
-        self.timer_start = tk.Button(self.middle_frame, text="Start", command=self.start, font=("",30))
+        self.timer_start = tk.Button(self.middle_frame, text="Start", command=self.start, font=("", 30))
         self.timer_start.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
 
         # Pause button
-        self.timer_pause = tk.Button(self.middle_frame, text="Pause", command=self.pause, font=("",30))
+        self.timer_pause = tk.Button(self.middle_frame, text="Pause", command=self.pause, font=("", 30))
         self.timer_pause.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
 
         # Reset button
@@ -76,11 +79,11 @@ class Application(tk.Frame):
         self.second_frame.pack(anchor=tk.CENTER, side=tk.BOTTOM, fill=tk.BOTH, expand=1)
         
         # setting button
-        self.setting = tk.Button(self.second_frame, text="Settings", command=self.open_setting_window, font=("",20))
-        self.setting.pack(side=tk.TOP, fill=tk.BOTH,expand=1)
-        
+        self.setting = tk.Button(self.second_frame, text="Settings", command=self.open_setting_window, font=("", 20))
+        self.setting.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
         # quit button
-        self.quit = tk.Button(self.second_frame, text="Quit", fg="red", command=self.master.destroy, font=("",10))
+        self.quit = tk.Button(self.second_frame, text="Quit", fg="red", command=self.master.destroy, font=("", 10))
         self.quit.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=1)
 
     def config_parsing(self):
@@ -108,40 +111,50 @@ class Application(tk.Frame):
 
     def open_setting_window(self):
         self.timer_paused = True
+
         setting_window = tk.Toplevel(self)
         setting_window.geometry("400x300+10+10")
-        setting_window.resizable(0,0)
+        setting_window.resizable(0, 0)
+        setting_window.grab_set()
 
         def save():
+
             self.modes['pomodoro'] = int(setting_window.working_entry.get())
             self.modes['long'] = int(setting_window.long_entry.get())
             self.modes['short'] = int(setting_window.short_entry.get())
+            self.remaining = self.modes[self.timer_var.get()] * 60
             self.save_config()
-            self.remaining = self.modes[self.timer_var.get()]*60
             self.reset()
+            minute, second = divmod(self.remaining, 60)
+            hour, minute = divmod(minute, 60)
+            time_format = "{:02d}:{:02d}:{:02d}".format(hour, minute, second)
+            app.timer_text.config(text=time_format)
             setting_window.destroy()
 
+        # Working Label and Entry
         setting_window.working_label = tk.Label(setting_window, text="Working time (in minutes)")
         setting_window.working_label.place(x=10, y=30)
         setting_window.pomodoro_val = tk.StringVar(setting_window, value=str(self.modes['pomodoro']))
         setting_window.working_entry = tk.Entry(setting_window, textvariable=setting_window.pomodoro_val)
         setting_window.working_entry.place(x=10, y=50)
 
-        setting_window.long_label = tk.Label(setting_window, text="Long Break time (in minutes)")
-        setting_window.long_label.place(x=10, y=80)
-        setting_window.long_val = tk.StringVar(setting_window, value=str(self.modes['long']))
-        setting_window.long_entry = tk.Entry(setting_window, textvariable=setting_window.long_val)
-        setting_window.long_entry.place(x=10, y=100)
-
+        # Short Label and Entry
         setting_window.short_label = tk.Label(setting_window, text="Short Break time (in minutes)")
-        setting_window.short_label.place(x=10, y=130)
+        setting_window.short_label.place(x=10, y=80)
         setting_window.short_val = tk.StringVar(setting_window, value=str(self.modes['short']))
         setting_window.short_entry = tk.Entry(setting_window, textvariable=setting_window.short_val)
-        setting_window.short_entry.place(x=10, y=150)
-        setting_window.save_button = tk.Button(setting_window, text="Save", command=save)
-        setting_window.save_button.place(x=150, y=200)
+        setting_window.short_entry.place(x=10, y=100)
 
-        setting_window.grab_set()
+        # Long Label and Entry
+        setting_window.long_label = tk.Label(setting_window, text="Long Break time (in minutes)")
+        setting_window.long_label.place(x=10, y=130)
+        setting_window.long_val = tk.StringVar(setting_window, value=str(self.modes['long']))
+        setting_window.long_entry = tk.Entry(setting_window, textvariable=setting_window.long_val)
+        setting_window.long_entry.place(x=10, y=150)
+
+        # Save button
+        setting_window.save_button = tk.Button(setting_window, text="Save", command=save)
+        setting_window.save_button.place(x=170, y=200)
 
     def start(self):
         self.timer_paused = False
@@ -159,6 +172,7 @@ class Application(tk.Frame):
             self.timer_paused = False
             self.timer_f(self.remaining)
             self.timer_paused = True
+            pygame.mixer.music.stop()
 
     def start_timer(self):
         mode = self.timer_var.get()
@@ -176,21 +190,28 @@ class Application(tk.Frame):
         self.clock_text.config(text=hour + ":" + minute + ":" + second)
         self.master.after(1000, self.clock_f)
 
-    def timer_f(self, time, started=True):
-        if time >= 0:
+    def timer_f(self, seconds, started=True):
+        if seconds >= 0:
             if started:
-                self.remaining = time
+                self.remaining = seconds
             if self.timer_paused:
-                self.curr_timer = self.master.after(1000, self.timer_f, time, False)
+                self.curr_timer = self.master.after(1000, self.timer_f, seconds, False)
             else:
-                minute, second = divmod(time, 60)
+                minute, second = divmod(seconds, 60)
                 hour, minute = divmod(minute, 60) 
                 time_format = "{:02d}:{:02d}:{:02d}".format(hour, minute, second)
                 app.timer_text.config(text=time_format)
-                self.curr_timer = self.master.after(1000, self.timer_f, time -1, False)
+                self.curr_timer = self.master.after(1000, self.timer_f, seconds - 1, False)
+        else:
+
+            pygame.mixer.music.load('sounds/default.ogg')
+            pygame.mixer.music.play()
+
+
+
 
 
 root = tk.Tk()
+
 app = Application(master=root)
 app.mainloop()
-
