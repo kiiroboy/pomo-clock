@@ -30,4 +30,7 @@ exe = EXE(pyz,
           upx=True,
           upx_exclude=[],
           runtime_tmpdir=None,
-          console=True )
+          console=False )
+import shutil
+shutil.copyfile('config.ini', '{0}/config.ini'.format(DISTPATH))
+shutil.copytree('sounds', '{0}/sounds'.format(DISTPATH))
