@@ -1,5 +1,7 @@
 import tkinter as tk
-import notify2 as notification
+import time
+import threading
+import sys
 import pygame
 from configparser import ConfigParser
 
@@ -16,8 +18,8 @@ class Application(tk.Frame):
         self.remaining = self.modes["pomodoro"]*60
         self.timer_paused = False
         pygame.init()
-        pygame.mixer.init()
-
+        self.mixer = pygame.mixer
+        self.thread_running = False
         self.create_widgets() 
 
     def create_widgets(self):
@@ -172,9 +174,10 @@ class Application(tk.Frame):
             self.timer_paused = False
             self.timer_f(self.remaining)
             self.timer_paused = True
-            pygame.mixer.music.stop()
+            self.thread_running = False
 
     def start_timer(self):
+        self.thread_running = False
         mode = self.timer_var.get()
         self.disabled_when_selected(mode)
         if self.curr_timer is not None:
@@ -190,6 +193,14 @@ class Application(tk.Frame):
         self.clock_text.config(text=hour + ":" + minute + ":" + second)
         self.master.after(1000, self.clock_f)
 
+    def thread_music_stop(self, after=5):
+        while after >= 0:
+            if not self.thread_running:
+                break
+            time.sleep(1)
+            after -= 1
+        self.mixer.music.stop()
+
     def timer_f(self, seconds, started=True):
         if seconds >= 0:
             if started:
@@ -201,17 +212,19 @@ class Application(tk.Frame):
                 hour, minute = divmod(minute, 60) 
                 time_format = "{:02d}:{:02d}:{:02d}".format(hour, minute, second)
                 app.timer_text.config(text=time_format)
-                self.curr_timer = self.master.after(1000, self.timer_f, seconds - 1, False)
+                self.curr_timer = self.master.after(0, self.timer_f, seconds - 1, False)
         else:
+            self.timer_paused = True
+            self.mixer.music.load('sounds/default.ogg')
+            self.mixer.music.play()
 
-            pygame.mixer.music.load('sounds/default.ogg')
-            pygame.mixer.music.play()
-
-
-
+            thread = threading.Thread(target=lambda: self.thread_music_stop(after=7))
+            thread.daemon = True
+            self.thread_running = True
+            thread.start()
 
 
 root = tk.Tk()
-
+root.title("PomodoroClock")
 app = Application(master=root)
 app.mainloop()

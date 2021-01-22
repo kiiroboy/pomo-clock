@@ -1,8 +1,6 @@
-before running the timer, the text would show the current time, when pressing the start, the current time feature will be stopped and replaced with timer
+chang start and pause to shape
 
-implement a class Sessions which includes 
-implement a "end sessions" which ends the current timer and return the timer to clock
+adding a task list
 
-testing
+adding option to play background music when running
 
-change start and pause to shape
