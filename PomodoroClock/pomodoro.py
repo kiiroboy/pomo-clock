@@ -212,7 +212,7 @@ class Application(tk.Frame):
                 hour, minute = divmod(minute, 60) 
                 time_format = "{:02d}:{:02d}:{:02d}".format(hour, minute, second)
                 app.timer_text.config(text=time_format)
-                self.curr_timer = self.master.after(0, self.timer_f, seconds - 1, False)
+                self.curr_timer = self.master.after(1000, self.timer_f, seconds - 1, False)
         else:
             self.timer_paused = True
             self.mixer.music.load('sounds/default.ogg')

@@ -1,6 +1,1 @@
-chang start and pause to shape
-
-adding a task list
-
-adding option to play background music when running
 
