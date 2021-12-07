@@ -83,7 +83,7 @@ class Application(tk.Frame):
         # setting button
         self.setting = tk.Button(self.second_frame, text="Settings", command=self.open_setting_window, font=("", 20))
         self.setting.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-
+        
         # quit button
         self.quit = tk.Button(self.second_frame, text="Quit", fg="red", command=self.master.destroy, font=("", 10))
         self.quit.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=1)
