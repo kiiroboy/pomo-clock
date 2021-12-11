@@ -1,3 +1,4 @@
+#!/home/tath2701/venv/pomo-clock-env/bin/python
 import tkinter as tk
 import time
 import threading
